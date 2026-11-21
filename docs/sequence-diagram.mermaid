@@ -1,0 +1,49 @@
+sequenceDiagram
+    autonumber
+    participant U as 用户/浏览器
+    participant M as main.jsx
+    participant LP as LanguageProvider
+    participant LS as localStorage
+    participant App as App.jsx
+    participant SPY as useScrollSpy
+    participant Nav as Navbar
+    participant Sec as Section 组件
+    participant UT as utils(pick/t)
+
+    U->>M: 加载页面
+    M->>M: 注入 ThemeProvider + CssBaseline
+    M->>LP: 挂载 LanguageProvider
+    LP->>LS: 读取 resume_lang
+    alt 存在持久化语言
+        LS-->>LP: 返回 'zh' / 'en'
+    else 无记录
+        LP->>LP: 依据 navigator.language 推断，默认 'zh'
+    end
+    LP->>LP: setLang(initialLang)
+    LP-->>M: 提供 { lang, setLanguage, t, pick }
+    M->>App: 渲染 App
+    App->>SPY: useScrollSpy(6 个 section id)
+    SPY->>SPY: IntersectionObserver 观察各 section
+    SPY-->>App: activeId（当前高亮项）
+    App->>Nav: 渲染（传入 activeId、lang）
+    App->>Sec: 渲染 6 大 Section
+    Sec->>UT: pick(resume.xxx, lang) / t(path, lang)
+    UT-->>Sec: 返回当前语言文案
+    Sec-->>U: 呈现深色科技感页面 + 进入动画
+
+    Note over U,Nav: —— 用户点击语言切换 ——
+    U->>Nav: 点击 中/EN
+    Nav->>LP: setLanguage(nextLang)
+    LP->>LP: 记录 y = window.scrollY
+    LP->>LS: 写入 resume_lang = nextLang
+    LP->>LP: setLang(nextLang) → Context 更新
+    LP->>LP: requestAnimationFrame(() => scrollTo(0, y))
+    LP-->>Sec: 新 lang 触发重渲染，文案整体切换
+    Sec-->>U: 文案已切换，滚动位置保持不变
+
+    Note over U,SPY: —— 用户滚动页面 ——
+    U->>SPY: 滚动到某 section
+    SPY->>SPY: IO 回调计算可见度最高的 section
+    SPY-->>App: 更新 activeId
+    App->>Nav: 传入新 activeId
+    Nav-->>U: 对应导航项高亮

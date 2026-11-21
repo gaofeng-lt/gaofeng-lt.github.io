@@ -1,0 +1,131 @@
+classDiagram
+    direction TB
+
+    class Localized {
+        +string zh
+        +string en
+    }
+    class ResumeData {
+        +Hero hero
+        +string avatar
+        +About about
+        +Experience[] experiences
+        +Project[] projects
+        +SkillGroup[] skills
+        +Education[] education
+        +Contact contact
+    }
+    class Hero {
+        +Localized name
+        +Localized title
+        +Localized tagline
+        +Localized intro
+        +Localized location
+        +Localized[] typewriterWords
+    }
+    class About {
+        +Localized[] paragraphs
+        +Stat[] stats
+    }
+    class Stat {
+        +string value
+        +Localized label
+    }
+    class Experience {
+        +Localized company
+        +Localized role
+        +Localized period
+        +Localized[] highlights
+        +EmphasisLevel emphasis
+    }
+    class EmphasisLevel {
+        <<enumeration>>
+        primary
+        secondary
+        placeholder
+    }
+    class Project {
+        +string name
+        +Localized desc
+        +string[] stack
+        +string link
+    }
+    class SkillGroup {
+        +Localized category
+        +SkillItem[] items
+    }
+    class SkillItem {
+        +string name
+        +number level
+    }
+    class Education {
+        +Localized school
+        +Localized major
+        +Localized degree
+        +string period
+    }
+    class Contact {
+        +string email
+        +string phone
+        +string github
+        +string linkedin
+        +string website
+    }
+    class Translations {
+        +TranslationDict zh
+        +TranslationDict en
+    }
+    class LanguageContext {
+        +Locale lang
+        +setLanguage(next) void
+        +t(path) string
+        +pick(value) string
+        +persistAndRestoreScroll() void
+    }
+    class useScrollSpy {
+        +string[] ids
+        +string activeId
+        +observe() void
+    }
+    class useTypewriter {
+        +Localized[] words
+        +Locale lang
+        +string displayText
+    }
+    class useCountUp {
+        +number target
+        +number current
+        +RefObject ref
+    }
+    class App {
+        +render() JSX
+    }
+    class Section {
+        <<interface>>
+        +render() JSX
+    }
+
+    ResumeData *-- Hero
+    ResumeData *-- About
+    ResumeData "1" *-- "n" Experience
+    ResumeData "1" *-- "n" Project
+    ResumeData "1" *-- "n" SkillGroup
+    ResumeData "1" *-- "n" Education
+    ResumeData *-- Contact
+    About "1" *-- "n" Stat
+    SkillGroup "1" *-- "n" SkillItem
+    Hero "1" *-- "n" Localized
+    Experience "1" *-- "n" Localized
+    Experience --> EmphasisLevel : emphasis (可选)
+    Stat *-- Localized
+    Project *-- Localized
+
+    LanguageContext ..> Translations : 读取文案
+    LanguageContext ..> Localized : pick 取值
+    App --> LanguageContext : Provider 注入
+    App --> useScrollSpy : 高亮
+    App "1" o-- "6" Section : 组合
+    Section ..> LanguageContext : 消费 lang
+    Section ..> ResumeData : 消费数据
+    Section ..> useTypewriter : Hero 用
+    Section ..> useCountUp : About 用
