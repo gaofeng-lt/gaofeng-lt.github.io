@@ -2,11 +2,13 @@
 
 深色科技感单页简历站，中英双语，纯静态 SPA。
 
-## 在线地址
+## 在线地址（正式）
 
-https://2ed8d3fe1b1541ccb988614952376c48.app-tencent.workbuddy.host
+**https://gaofeng-lt.github.io/**
 
-> 免费预览环境。如需绑定自己的域名或长期稳定托管，可后续迁移到 Vercel / Netlify（构建命令 `npm run build`，产物目录 `dist/`）。
+通过 GitHub Pages 部署，永久免费、稳定可访问。仓库：`gaofeng-lt/gaofeng-lt.github.io`（public）。
+
+> 如需绑定自己的域名，在仓库 Settings → Pages → Custom domain 中配置即可。
 
 ## 本地运行
 
